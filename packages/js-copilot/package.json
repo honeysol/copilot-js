@@ -1,0 +1,25 @@
+{
+  "name": "js-copilot",
+  "version": "0.0.0-alpha.1",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc --build ./tsconfig.json",
+    "watch": "tsc --build --watch ./tsconfig.json",
+    "clean": "rm -rf ./dist && tsc --build --clean ./tsconfig.json"
+  },
+  "author": "",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./dist/helpers/*": "./dist/helpers/*",
+    "./helpers/*": "./dist/helpers/*",
+    ".": "./dist/index.js"
+  }
+}

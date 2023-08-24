@@ -1,0 +1,28 @@
+{
+  "name": "copilot.js",
+  "version": "1.0.0",
+  "description": "copilot implementation in typescript",
+  "types": "dist/index.d.ts",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.5.4",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
+    "eslint": "^8.47.0",
+    "eslint-config-prettier": "^9.0.0",
+    "lerna": "^7.1.5",
+    "prettier": "^3.0.2",
+    "typescript": "^5.1.6"
+  },
+  "scripts": {
+    "build": "lerna run build",
+    "lint": "lerna run lint",
+    "echo": "lerna run echo",
+    "watch": "lerna run build && lerna run --parallel watch",
+    "publish": "npm run build && lerna publish"
+  },
+  "author": "",
+  "license": "MIT"
+}

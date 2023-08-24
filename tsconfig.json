@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "es6",
+    "moduleResolution": "node",
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "lib": ["dom", "esnext"],
+    "resolveJsonModule": true,
+    "declaration": true,
+    "sourceMap": true,
+    "composite": true,
+    "stripInternal": true,
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "references": [
+    {
+      "js-copilot": "packages/js-copilot",
+      "react-copilot": "packages/react-copilot"
+    }
+  ]
+}
