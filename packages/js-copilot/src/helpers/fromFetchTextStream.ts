@@ -1,5 +1,12 @@
 import { StreamState } from "..";
 
+/**
+ * Creates an observable stream from a fetch response that contains text stream.
+ * @param {function} callback A function to be called for each text chunk.
+ * @param {object} controller An AbortController instance that can be used to abort the request.
+ * @param {object} responsePromise A promise that resolves to a fetch response that contains text stream.
+ * @returns {StreamState} An observable stream of SSE data events.
+ */
 export const fromFetchTextStream = ({
   callback,
   controller,

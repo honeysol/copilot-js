@@ -13,14 +13,30 @@ import { scrollIntoCursor } from "./utils/scroll";
 
 const completionClassName = "completion" + Math.random().toString(36).slice(2);
 
+/**
+ * @typedef StreamState
+ * @property {Function} abort - Function to abort the stream
+ * @property {Promise<void>} promise - Promise that resolves when the stream is finished
+ * @property {boolean} finished - Whether the stream has finished
+ */
 export type StreamState = {
   abort: () => void;
   promise: Promise<void>;
   finished: boolean;
 };
 
+/**
+ * @typedef CompletionHandler
+ * @description Callback to append completion result
+ * @param {Object} params - Parameters for the completion handler
+ * @param {string} [params.precedingText] - Text before the cursor
+ * @param {string} [params.followingText] - Text after the cursor
+ * @param {Function} callback - Callback to append completion result
+ * @returns {StreamState}
+ */
 export type CompletionHandler = (params: {
   precedingText?: string | undefined;
+
   followingText?: string | undefined;
   callback: (output: string) => void;
 }) => StreamState;
@@ -33,10 +49,32 @@ const getCompletionNode = (text: string) => {
   return node;
 };
 
+/**
+ * @class CopilotEngine
+ * @description Engine to handle completion. You can conver any DIV element to a completion-enabled editor.
+ * @param {Object} params - Parameters for the CopilotEngine
+ * @param {string} params.value - Initial value
+ * @param {boolean} [params.textOnly=true] - If true, only text can be inserted
+ * @param {Function} [params.onChange] - Callback when value is changed
+ * @param {number} [params.delay] - Delay to start automatic completion. If not specified, completion not start automatically.
+ * @param {CompletionHandler} params.handler - Completion handler
+ */
 export class CopilotEngine {
+  /**
+   *  @field {boolean} textOnly - If true, only text can be inserted
+   */
   textOnly?: boolean;
+  /**
+   * @field {Function} onChange - Callback when value is changed
+   */
   onChange?: (value: string) => void;
+  /**
+   * @field {number} delay - Delay to start automatic completion. If not specified, completion not start automatically.
+   */
   delay?: number;
+  /**
+   * @field {CompletionHandler} handler - Completion handler
+   */
   handler?: CompletionHandler;
   /**
    * @internal

@@ -1,9 +1,9 @@
 type NodeLike = Node | Node[] | string;
 
 /**
- * Move the cursor position to either before or after the given nodes.
- * @param nodes - An array of nodes where the cursor position needs to be moved.
- * @param cursor - Optional. Determines the position where the cursor should be moved.
+ * @description Move the cursor position to either before or after the given nodes.
+ * @param {Node[]} nodes - An array of nodes where the cursor position needs to be moved.
+ * @param {"before" | "after" | undefined} cursor - Optional. Determines the position where the cursor should be moved.
  *                 Can be "before" or "after". If not provided, no operation will be performed.
  * @returns void
  */
@@ -18,7 +18,7 @@ const moveCursorAtNode = (nodes: Node[], cursor?: "before" | "after") => {
     const parentElement = node.parentElement;
     if (!parentElement) return;
     const index = Array.from(parentElement.childNodes).indexOf(
-      node as ChildNode
+      node as ChildNode,
     );
     if (index < 0) throw new Error("internal error");
     selection.setPosition(parentElement, index + (cursor === "after" ? 1 : 0));
@@ -26,7 +26,7 @@ const moveCursorAtNode = (nodes: Node[], cursor?: "before" | "after") => {
 };
 
 /**
- * Inserts a node (or multiple nodes) into a parent node at a specified location.
+ * @description Inserts a node (or multiple nodes) into a parent node at a specified location.
  * After insertion, it can optionally move the cursor before or after the inserted nodes.
  *
  * @param nodeToInsert - The node (or nodes) to be inserted. This can be a single Node,
@@ -42,7 +42,7 @@ const insertNode = (
   nodeToInsert: NodeLike,
   parentNode: Node | null,
   nextNode?: Node | null,
-  cursor?: "after" | "before"
+  cursor?: "after" | "before",
 ) => {
   if (!parentNode) return;
   const nodesToInsert = (() => {
@@ -87,7 +87,7 @@ const insertNode = (
  */
 const insertAtCursor = (
   nodeToInsert: NodeLike,
-  cursor?: "after" | "before"
+  cursor?: "after" | "before",
 ) => {
   const selection = window.getSelection();
   if (!selection) return;

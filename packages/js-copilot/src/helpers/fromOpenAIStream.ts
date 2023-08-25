@@ -2,6 +2,12 @@ import { StreamState } from "..";
 
 type Stream<T> = AsyncIterable<T>;
 
+/**
+ * Creates an observable stream from a OpenAI Stream object.
+ * @param {function} callback A function to be called for each SSE data event.
+ * @param {object} streamPromise A promise that resolves to  OpenAI Stream object.
+ * @returns {StreamState} An observable stream.
+ */
 export const fromOpenAIStream = <T>(
   streamPromise: Promise<Stream<T>>,
   callback: (chunk: T) => void,
