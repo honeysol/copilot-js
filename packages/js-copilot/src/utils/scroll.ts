@@ -35,9 +35,12 @@ export const scrollIntoCursor = (container?: Element | null) => {
     console.log("empty rect", rect);
     return;
   }
+  const containerRect = container.getBoundingClientRect();
   container.scrollBy({
     top:
-      ((rect?.top || 0) + (rect?.bottom || 0)) / 2 - container.clientHeight / 2,
+      ((rect?.top || 0) + (rect?.bottom || 0)) / 2 -
+      containerRect.top -
+      container.clientHeight / 2,
     behavior: "smooth",
   });
 };

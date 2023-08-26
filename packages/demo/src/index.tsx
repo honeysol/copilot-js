@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { ComponentProps, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 
 import { Copilot } from "react-copilot";
-import { callCompletion } from "./api/completion";
+import { callCompletion_sse as callCompletion } from "./api/completion_sse";
+import { FetchResponseError } from "js-copilot/dist/helpers/fromFetchTextStream";
 
 const App = () => {
   const [instruction, setInstruction] = useState<string>(
@@ -13,6 +14,39 @@ const App = () => {
     () => localStorage.getItem("apiKey") || "",
   );
   const [saveApiKey, setSaveApiKey] = useState<boolean>(!!apiKey);
+  const copilotProps: Pick<
+    ComponentProps<typeof Copilot>,
+    "onChange" | "handler" | "errorHandler"
+  > = useMemo(
+    () => ({
+      style: {
+        width: "300px",
+        minHeight: "100px",
+        padding: "5px",
+        border: "1px solid #ccc",
+        height: "200px",
+        overflowY: "auto",
+        scrollBehavior: "smooth",
+      },
+      onChange: (value: string) => {
+        setText(value);
+      },
+      handler: (params) => {
+        return callCompletion({
+          ...params,
+          apiKey,
+          text: instruction,
+        });
+      },
+      errorHandler: async (e) => {
+        if (e instanceof FetchResponseError) {
+          alert(e.data.error?.message);
+        }
+      },
+    }),
+    [apiKey, instruction],
+  );
+
   return (
     <>
       <h1>React Copilot Demo</h1>
@@ -23,39 +57,7 @@ const App = () => {
       >
         <div style={{}}>
           <div style={{}}>Copilot</div>
-          <Copilot
-            style={{
-              width: "300px",
-              minHeight: "100px",
-              padding: "5px",
-              border: "1px solid #ccc",
-              height: "200px",
-              overflowY: "auto",
-              scrollBehavior: "smooth",
-            }}
-            handler={(params) => {
-              const response = callCompletion({
-                ...params,
-                apiKey,
-                text: instruction,
-              });
-              (async () => {
-                try {
-                  await response.promise;
-                } catch (e) {
-                  console.error(e);
-                  if (e instanceof Response) {
-                    const data = await e.json();
-                    alert(data.error?.message);
-                  }
-                }
-              })();
-              return response;
-            }}
-            textOnly={false}
-            onChange={(text) => setText(text)}
-            value={text}
-          />
+          <Copilot textOnly={false} value={text} {...copilotProps} />
           Ctrl+Enter: Start completion <br />
           Esc: Close completion
         </div>

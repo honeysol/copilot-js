@@ -17,12 +17,10 @@ const completionClassName = "completion" + Math.random().toString(36).slice(2);
  * @typedef StreamState
  * @property {Function} abort - Function to abort the stream
  * @property {Promise<void>} promise - Promise that resolves when the stream is finished
- * @property {boolean} finished - Whether the stream has finished
  */
 export type StreamState = {
   abort: () => void;
   promise: Promise<void>;
-  finished: boolean;
 };
 
 /**
@@ -36,10 +34,18 @@ export type StreamState = {
  */
 export type CompletionHandler = (params: {
   precedingText?: string | undefined;
-
   followingText?: string | undefined;
   callback: (output: string) => void;
 }) => StreamState;
+
+/**
+ * @typedef ErrorHandler
+ * @description Callback to handle errors
+ * @param {any} error - The error to handle
+ * @returns {void}
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ErrorHandler = (error: any) => void;
 
 const getCompletionNode = (text: string) => {
   const node = document.createElement("span");
@@ -58,6 +64,7 @@ const getCompletionNode = (text: string) => {
  * @param {Function} [params.onChange] - Callback when value is changed
  * @param {number} [params.delay] - Delay to start automatic completion. If not specified, completion not start automatically.
  * @param {CompletionHandler} params.handler - Completion handler
+ * @param {ErrorHandler} params.errorHandler - error handler, callback error in CompletionHandler
  */
 export class CopilotEngine {
   /**
@@ -76,6 +83,10 @@ export class CopilotEngine {
    * @field {CompletionHandler} handler - Completion handler
    */
   handler?: CompletionHandler;
+  /**
+   * @field {CompletionHandler} errorHandler - error handler, callback error in CompletionHandler
+   */
+  errorHandler?: ErrorHandler;
   /**
    * @internal
    */
@@ -102,15 +113,18 @@ export class CopilotEngine {
     onChange?: (value: string) => void;
     delay?: number;
     handler: CompletionHandler;
+    errorHandler?: ErrorHandler;
     element: HTMLDivElement;
   }) {
     this.textOnly = params.textOnly !== false;
     this.onChange = params.onChange;
     this.delay = params.delay;
     this.handler = params.handler;
+    this.errorHandler = params.errorHandler;
     this.containerElement = params.element;
     this.value = params.value;
 
+    this.containerElement.setAttribute("contenteditable", "true");
     this.containerElement.addEventListener("keydown", this.onKeyDown);
     this.containerElement.addEventListener("input", this.onInput);
     this.containerElement.addEventListener("paste", this.onPaste);
@@ -161,42 +175,31 @@ export class CopilotEngine {
     if (e.key === "Enter" && e.ctrlKey) {
       e.preventDefault();
       this.startCompletion();
-    } else if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) {
-      // noop
-    } else if (e.key === "Enter") {
+    } else if (e.key === "Enter" && !e.altKey && !e.metaKey) {
       e.preventDefault();
       insertBeforeCursor("\n");
-      this.stopCompletion();
-      this.requestCompletion();
       this.onValueChange();
       scrollIntoCursor(this.containerElement);
+    } else if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) {
+      // noop
     } else if (e.key === "Tab") {
       e.preventDefault();
       if (!this.completionRequest || !this.completionElement) return;
-      const candidateCompletion = this.completionElement.innerText;
-      if (!candidateCompletion) return;
-      const sepeartorMatch =
-        candidateCompletion.match(/[。、！,」｝.,!} \n]+?/);
-      const newDeterminedCompletion = sepeartorMatch
-        ? candidateCompletion.slice(
-            0,
-            (sepeartorMatch?.index || 0) + sepeartorMatch[0].length,
-          )
-        : candidateCompletion;
-      this.completionElement.innerText = candidateCompletion.slice(
-        newDeterminedCompletion.length,
-      );
-      insertBeforeNode(newDeterminedCompletion, this.completionElement);
-      const rect = this.completionElement.getBoundingClientRect();
-      this.containerElement?.scrollBy({
-        top: (rect?.top || 0) - this.containerElement?.clientHeight / 2,
-        behavior: "smooth",
-      });
+      const copletionText = this.completionElement.innerText;
+      if (!copletionText) return;
+      const sepeartorMatch = copletionText.match(/[。、！,」｝.,!} \n]/);
+      const separatorPosition = sepeartorMatch
+        ? (sepeartorMatch.index || 0) + sepeartorMatch[0].length
+        : copletionText.length;
+      const determinedCompletion = copletionText.slice(0, separatorPosition);
+      this.completionElement.innerText = copletionText.slice(separatorPosition);
+      insertBeforeNode(determinedCompletion, this.completionElement);
+      scrollIntoCursor(this.containerElement);
       this.onValueChange();
     } else if (["Escape"].includes(e.key)) {
       this.stopCompletion();
     } else if (e.key.length > 1) {
-      // noop
+      // normal key
     } else {
       this.stopCompletion();
       this.requestCompletion();
@@ -213,7 +216,7 @@ export class CopilotEngine {
    * @internal
    */
   private onPaste = (e: ClipboardEvent) => {
-    if (!this.textOnly) return;
+    if (!this.textOnly && !this.completionElement) return;
     e.preventDefault();
     const text = e.clipboardData?.getData("text/plain");
     if (!text) return;
@@ -225,7 +228,7 @@ export class CopilotEngine {
    * @internal
    */
   private onDrop = (e: DragEvent) => {
-    if (!this.textOnly) return;
+    if (!this.textOnly && !this.completionElement) return;
     e.preventDefault();
     const text = e.dataTransfer?.getData("text/plain");
     if (!text) return;
@@ -280,6 +283,7 @@ export class CopilotEngine {
    */
   private stopCompletion() {
     if (!this.completionRequest) return;
+    // Element with completionClassName may be separated by pasting HTML, so we need to remove all.
     this.containerElement
       ?.querySelectorAll(`.${completionClassName}`)
       .forEach((dom) => {
@@ -298,16 +302,35 @@ export class CopilotEngine {
     this.completionElement = getCompletionNode("");
     insertAfterCursor(this.completionElement);
     const precedingText = getTextBeforeCursor(this.containerElement);
-    const followingText = getTextAfterCursor(this.containerElement);
+    const followingText = getTextAfterCursor(this.containerElement)?.replace(
+      /\n$/,
+      "",
+    );
+    const onError = (error: unknown) => {
+      this.stopCompletion();
+      if (this.errorHandler) this.errorHandler?.(error);
+      else throw error;
+    };
     console.log({ precedingText, followingText });
-    this.completionRequest = this.handler?.({
-      precedingText,
-      followingText,
-      callback: (output) => {
-        if (!this.completionElement) return;
-        appendNode(output, this.completionElement);
-      },
-    });
+    try {
+      this.completionRequest = this.handler?.({
+        precedingText,
+        followingText,
+        callback: (output) => {
+          if (!this.completionElement) return;
+          appendNode(output, this.completionElement);
+        },
+      });
+    } catch (e) {
+      onError(e);
+    }
+    (async () => {
+      try {
+        await this.completionRequest?.promise;
+      } catch (e) {
+        onError(e);
+      }
+    })();
   }
   /**
    * @internal

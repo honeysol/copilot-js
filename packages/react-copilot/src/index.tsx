@@ -5,7 +5,7 @@
 
 import React, { CSSProperties, useEffect, useRef } from "react";
 
-import { CopilotEngine, CompletionHandler } from "js-copilot";
+import { CopilotEngine, CompletionHandler, ErrorHandler } from "js-copilot";
 export type { CompletionHandler };
 
 /**
@@ -18,6 +18,7 @@ export type { CompletionHandler };
  * @param {(value: string) => void} [props.onChange] - A callback function that is called when the value of the component changes.
  * @param {number} [props.delay] - The delay in milliseconds before the completion engine starts.
  * @param {CompletionHandler} props.handler - The completion handler to use.
+ * @params {ErrorCallback} [props.errorHandler] - The error handler to use.
  * @returns {JSX.Element} The Copilot component.
  */
 export const Copilot = React.memo(function Copilot({
@@ -28,6 +29,7 @@ export const Copilot = React.memo(function Copilot({
   textOnly = true,
   delay,
   handler,
+  errorHandler,
 }: {
   style?: CSSProperties;
   className?: string | undefined;
@@ -36,6 +38,7 @@ export const Copilot = React.memo(function Copilot({
   onChange?: (value: string) => void;
   delay?: number;
   handler: CompletionHandler;
+  errorHandler: ErrorHandler;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const copilot = useRef<CopilotEngine>();
@@ -49,6 +52,7 @@ export const Copilot = React.memo(function Copilot({
         delay,
         handler,
         value,
+        errorHandler,
         element: containerRef.current,
       });
     } else {
@@ -57,6 +61,7 @@ export const Copilot = React.memo(function Copilot({
       copilot.current.delay = delay;
       copilot.current.handler = handler;
       copilot.current.value = value;
+      copilot.current.errorHandler = errorHandler;
     }
   });
 
@@ -66,17 +71,7 @@ export const Copilot = React.memo(function Copilot({
 
   return (
     <>
-      <div
-        ref={containerRef}
-        className={className}
-        style={style}
-        contentEditable={true}
-        suppressContentEditableWarning={true}
-      >
-        <div>
-          <br />
-        </div>
-      </div>
+      <div ref={containerRef} className={className} style={style}></div>
     </>
   );
 });

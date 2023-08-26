@@ -5,15 +5,18 @@ This is a demo application that showcases the usage of the js-copilot programmin
 ## Installation
 
 1. Clone the repository
-2. Install dependencies with `npm install`
-3. Start the development server with `npm start`
+2. Move to the root of monorepo.
+3. Install dependencies with `npm install`
+4. Build library with `npm run build`
+5. Move to the demo directory with `cd ./packages/demo`
+6. Start the development server with `npm start`
 
 ## Usage
 
 1. Type a prompt in the "Instruction" textarea
-2. Copilot will generate text in the "Generated text" textarea based on the prompt
-3. Use the generated text in your project
-
+2. Input OpenAI API key. (this key is stored only in browser not sent to anywhere)
+3. Input text in the "Copilot" area. Press Ctrl+Enter to start completion.
+4. Copilot will generate text in the "Generated text" textarea.
 
 ## Contributing
 

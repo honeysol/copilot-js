@@ -1,6 +1,23 @@
 import { StreamState } from "..";
 
 /**
+ * Custom error class for fetch response errors.
+ */
+export class FetchResponseError extends Error {
+  response: Response;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(response: Response, data: any, cause?: Error) {
+    super(undefined, cause ? { cause } : undefined);
+    this.response = response;
+    this.data = data;
+  }
+}
+
+new Error(undefined, { cause: new Error() });
+
+/**
  * Creates an observable stream from a fetch response that contains text stream.
  * @param {function} callback A function to be called for each text chunk.
  * @param {object} controller An AbortController instance that can be used to abort the request.
@@ -24,8 +41,21 @@ export const fromFetchTextStream = ({
     },
     promise: (async () => {
       const response = await responsePromise;
-      if (response.status !== 200) {
-        throw response;
+      if (!response.ok) {
+        throw await (async () => {
+          try {
+            const isJson = response.headers
+              .get("Content-Type")
+              ?.includes("application/json");
+            if (isJson) {
+              return new FetchResponseError(response, await response.json());
+            } else {
+              return new FetchResponseError(response, await response.text());
+            }
+          } catch (e) {
+            return new FetchResponseError(response, undefined, e as Error);
+          }
+        })();
       }
       const reader = response.body?.getReader();
       if (!reader) return;
@@ -48,15 +78,6 @@ export const fromFetchTextStream = ({
         }
       }
     })(),
-    finished: false,
   };
-  (async () => {
-    try {
-      await streamState.promise;
-      streamState.finished = true;
-    } catch (e) {
-      //
-    }
-  })();
   return streamState;
 };
