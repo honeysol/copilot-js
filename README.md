@@ -16,12 +16,12 @@ LLM has changed people's work and life significantly. However, it does not alway
 
 # Guide for users
 
-### normal state:
+## normal state:
 | Key | Action |
 |-----|--------|
 | Ctrl+Enter | Start completion |
 
-### completion state:
+## completion state:
 | Key | Action |
 |-----|--------|
 | Esc | Collapse completion |

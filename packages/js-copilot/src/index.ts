@@ -65,6 +65,7 @@ const getCompletionNode = (text: string) => {
  * @param {number} [params.delay] - Delay to start automatic completion. If not specified, completion not start automatically.
  * @param {CompletionHandler} params.handler - Completion handler
  * @param {ErrorHandler} params.errorHandler - error handler, callback error in CompletionHandler
+ * @param {HTMLDivElement} params.element - The DIV element to be converted to a completion-enabled editor
  */
 export class CopilotEngine {
   /**

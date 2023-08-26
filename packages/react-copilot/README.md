@@ -51,3 +51,50 @@ const Component = () => {
 }
 
 ```
+
+# API Reference
+
+## Copilot
+
+Component to handle completion.
+
+```tsx
+<CopilotEngine
+  {...{
+    value: string;
+    textOnly?: boolean = true;
+    onChange?: (value: string) => void;
+    delay?: number;
+    handler: CompletionHandler;
+    errorHandler?: ErrorHandler;
+    className?: string;
+    style?: CSSProperties;
+
+  }}
+/>
+
+type CompletionHandler = (params: {
+  precedingText?: string | undefined;
+  followingText?: string | undefined;
+  callback: (output: string) => void;
+}) => StreamState;
+
+type StreamState = {
+  abort: () => void;
+  promise: Promise<void>;
+};
+
+type ErrorHandler = (error: any) => void;
+
+```
+### Props
+
+- `value`: Initial value.
+- `textOnly` (optional): If true, only text can be inserted. Default true.
+- `onChange` (optional): Callback when value is changed.
+- `delay` (optional): Delay to start automatic completion. If not specified, completion will not start automatically.
+- `handler`: Completion handler.
+- `errorHandler` (optional): Error handler, callback error in CompletionHandler.
+- `style` (optional): The style object to apply to the component.
+- `className` (optional): The CSS class to apply to the component.
+

@@ -20,12 +20,12 @@ See [/packages/demo](/packages/demo/README.md)
 
 # Guide for users
 
-### normal state:
+## normal state:
 | Key | Action |
 |-----|--------|
 | Ctrl+Enter | Start completion |
 
-### completion state:
+## completion state:
 | Key | Action |
 |-----|--------|
 | Esc | Collapse completion |
@@ -65,7 +65,7 @@ const copilot = new CopilotEngine({
 })
 ```
 
-### Step 3 Change parameter in runtime (if needed)
+## Step 3 Change parameter in runtime (if needed)
 
 All parameters of constructor except `container` can be changed in runtime.
 
@@ -80,3 +80,67 @@ When `value` is changed, cursor and completion state should be reset.
 # Examples
 
 See [/packages/demo/src/index.tsx](/packages/demo/src/index.tsx)
+
+# API Reference
+
+## CopilotEngine
+
+Engine to handle completion. You can convert any DIV element to a completion-enabled editor.
+
+### Constructor
+
+```ts
+new CopilotEngine(params: {
+  value: string;
+  textOnly?: boolean = true;
+  onChange?: (value: string) => void;
+  delay?: number;
+  handler: CompletionHandler;
+  errorHandler?: ErrorHandler;
+  element: HTMLDivElement
+}): CopilotEngine
+
+interface CopilotEngine {
+  value: string;
+  textOnly?: boolean;
+  onChange?: (value: string) => void;
+  delay?: number;
+  handler: CompletionHandler;
+  errorHandler?: ErrorHandler;
+}
+
+type CompletionHandler = (params: {
+  precedingText?: string | undefined;
+  followingText?: string | undefined;
+  callback: (output: string) => void;
+}) => StreamState;
+
+type StreamState = {
+  abort: () => void;
+  promise: Promise<void>;
+};
+
+type ErrorHandler = (error: any) => void;
+
+```
+### Parameters
+
+- `params`: An object with the following properties:
+  - `element`  The DIV element to be converted to a completion-enabled editor
+  - `value`: Initial value.
+  - `textOnly` (optional): If true, only text can be inserted. Default true.
+  - `onChange` (optional): Callback when value is changed.
+  - `delay` (optional): Delay to start automatic completion. If not specified, completion will not start automatically.
+  - `handler`: Completion handler.
+  - `errorHandler` (optional): Error handler, callback error in CompletionHandler.
+
+
+### Fields
+
+- `element`  The DIV element to be converted to a completion-enabled editor
+- `value`: Initial value.
+- `textOnly` (optional): If true, only text can be inserted. Default true.
+- `onChange` (optional): Callback when value is changed.
+- `delay` (optional): Delay to start automatic completion. If not specified, completion will not start automatically.
+- `handler`: Completion handler.
+- `errorHandler` (optional): Error handler, callback error in CompletionHandler.
