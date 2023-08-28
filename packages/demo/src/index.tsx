@@ -124,7 +124,7 @@ const App = () => {
       &nbsp;
       <button
         type="button"
-        onClick={(e) => {
+        onClick={() => {
           setSaveApiKey(false);
           setApiKey("");
           localStorage.removeItem("apiKey");

@@ -18,8 +18,8 @@
   },
   "scripts": {
     "build": "lerna run build",
-    "lint": "lerna run lint",
-    "echo": "lerna run echo",
+    "lint": "eslint packages/*/**/*.{ts,tsx,js,jsx}  --fix && prettier --write packages/*/src/**/*.ts",
+    "clean": "lerna run clean",
     "watch": "lerna run build && lerna run --parallel watch",
     "publish": "npm run build && lerna publish"
   },
