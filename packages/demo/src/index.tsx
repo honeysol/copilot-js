@@ -9,6 +9,7 @@ const App = () => {
   const [instruction, setInstruction] = useState<string>(
     "Write novel in Japanese.",
   );
+  const [textOnly, setTextOnly] = useState<boolean>(true);
   const [text, setText] = useState<string>("");
   const [apiKey, setApiKey] = useState<string>(
     () => localStorage.getItem("apiKey") || "",
@@ -57,7 +58,7 @@ const App = () => {
       >
         <div style={{}}>
           <div style={{}}>Copilot</div>
-          <Copilot textOnly={false} value={text} {...copilotProps} />
+          <Copilot textOnly={textOnly} value={text} {...copilotProps} />
           Ctrl+Enter: Start completion <br />
           Esc: Close completion
         </div>
@@ -95,6 +96,17 @@ const App = () => {
             }}
             value={text}
           ></textarea>
+        </div>
+        <div style={{ marginLeft: "20px" }}>
+          <div style={{}}>Options</div>
+          Text Only
+          <input
+            type="checkbox"
+            onChange={(e) => {
+              setTextOnly(e.currentTarget.checked);
+            }}
+            checked={textOnly}
+          />
         </div>
       </div>
       OpenAI API Key
