@@ -7,6 +7,11 @@
   "publishConfig": {
     "access": "public"
   },
+  "keywords": [
+    "copilot",
+    "chatgpt",
+    "openai"
+  ],
   "scripts": {
     "build": "tsc --build ./tsconfig.json",
     "watch": "tsc --build --watch ./tsconfig.json",
