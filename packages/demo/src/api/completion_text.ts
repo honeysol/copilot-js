@@ -1,4 +1,4 @@
-import { fromFetchTextStream } from "js-copilot/dist/helpers/fromFetchTextStream";
+import { fromFetchTextStream } from "copilot-js/dist/helpers/fromFetchTextStream";
 import { createFilter } from "./filter";
 
 export const callCompletion_text = ({

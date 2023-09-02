@@ -5,7 +5,7 @@
 
 import React, { CSSProperties, useEffect, useRef } from "react";
 
-import { CopilotEngine, CompletionHandler, ErrorHandler } from "js-copilot";
+import { CopilotEngine, CompletionHandler, ErrorHandler } from "copilot-js";
 export type { CompletionHandler };
 
 /**

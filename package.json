@@ -1,5 +1,5 @@
 {
-  "name": "copilot-js",
+  "name": "copilot-js-monorepo",
   "version": "1.0.0",
   "description": "copilot implementation in typescript",
   "types": "dist/index.d.ts",

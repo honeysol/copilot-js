@@ -12,7 +12,7 @@ LLM has changed people's work and lives significantly. However, it does not alwa
 
 # Remark
 This library converts pure DOM element into copilot.
-If you want to use it with React, use [react-copilot](/packages/react-copilot/README.md).
+If you want to use it with React, use [copilot-react](/packages/copilot-react/README.md).
 
 # Demo
 See [/packages/demo](/packages/demo/README.md)
@@ -41,7 +41,7 @@ Unlike Github copilot, you can perform operations such as arrow keys, copy, and 
 
 To install JS Copilot, you can use npm:
 
-npm i js-copilot
+npm i copilot-js
 
 ## Step 1 Create a completion handler.
 

@@ -10,8 +10,8 @@ LLM has changed people's work and lives significantly. However, it does not alwa
 
 ## Packages
 
-- [js-copilot](./packages/js-copilot/README.md)
-- [react-copilot](./packages/react-copilot/README.md)
+- [copilot-js](./packages/copilot-js/README.md)
+- [copilot-react](./packages/copilot-react/README.md)
 - [demo](./packages/demo/README.md)
 
 # Guide for users

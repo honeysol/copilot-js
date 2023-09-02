@@ -1,6 +1,6 @@
 # Copilot Demo
 
-This demo application showcases the usage of the js-copilot text editing assistant.
+This demo application showcases the usage of the copilot-js text editing assistant.
 
 ## Installation
 
