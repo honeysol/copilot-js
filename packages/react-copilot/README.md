@@ -1,15 +1,15 @@
-React component for Copilot 
+React component for Copilot. 
 
 # Background
-LLM has changed people's work and life significantly. However, it does not always return the right answer, and therefore has limited applications. Copilot UI greatly expands the applications of LLM by allowing collaboration between LLM and humans. For this, high-quality Copilot components are essential for the development of humans with LLM.
+LLM has changed people's work and lives significantly. However, it does not always return the correct answer and has limited applications. Copilot UI dramatically expands the applications of LLM by allowing collaboration between LLM and humans. For this, high-quality Copilot components are essential for the development of humans with LLM.
 
 # Features
-- Easy to use UI specialized for natural language input
-- Support for text-only or text containing HTML
-- Provide helpers for OpenAI library, SSE stream and text stream.
+- Easy-to-use UI specialized for natural language input
+- Support for text-only or text-containing HTML
+- Provide helpers
 
 # Example
-See [/packages/demo/src/index.tsx](/packages/demo/src/index.tsx) for detail.
+See [/packages/demo/src/index.tsx](/packages/demo/src/index.tsx) for details.
 
 ```tsx
 const Component = () => {
@@ -56,7 +56,7 @@ const Component = () => {
 
 ## Copilot
 
-Component to handle completion.
+Component to handle completion
 
 ```tsx
 <CopilotEngine
@@ -91,7 +91,7 @@ type ErrorHandler = (error: any) => void;
 
 - `value`: Initial value.
 - `textOnly` (optional): If true, only text can be inserted. Default true.
-- `onChange` (optional): Callback when value is changed.
+- `onChange` (optional): Callback when the value is changed.
 - `delay` (optional): Delay to start automatic completion. If not specified, completion will not start automatically.
 - `handler`: Completion handler.
 - `errorHandler` (optional): Error handler, callback error in CompletionHandler.

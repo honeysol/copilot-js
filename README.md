@@ -1,12 +1,12 @@
 Monorepo for JavaScript Copilot component.
 
 # Background
-LLM has changed people's work and life significantly. However, it does not always return the right answer, and therefore has limited applications. Copilot UI greatly expands the applications of LLM by allowing collaboration between LLM and humans. For this, high-quality Copilot components are essential for the development of humans with LLM.
+LLM has changed people's work and lives significantly. However, it does not always return the correct answer and has limited applications. Copilot UI dramatically expands the applications of LLM by allowing collaboration between LLM and humans. For this, high-quality Copilot components are essential for the development of humans with LLM.
 
 # Features
-- Easy to use UI specialized for natural language input
-- Support for text-only or text containing HTML
-- Provide helpers for OpenAI library, SSE stream and text stream.
+- Easy-to-use UI specialized for natural language input
+- Support for text-only or text-containing HTML
+- Provide helpers for the OpenAI library, SSE, and text streams.
 
 ## Packages
 
