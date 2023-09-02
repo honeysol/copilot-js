@@ -1,6 +1,6 @@
 {
   "name": "js-copilot",
-  "version": "0.0.0-alpha.1",
+  "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,5 +21,10 @@
     "./dist/helpers/*": "./dist/helpers/*",
     "./helpers/*": "./dist/helpers/*",
     ".": "./dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/honeysol/copilot-js.git",
+    "directory": "packages/js-copilot"
   }
 }
