@@ -36,7 +36,6 @@ Unlike Github copilot, you can perform operations such as arrow keys, copy, and 
 
 # Guide for developers
 
-
 ## Installation
 
 To install JS Copilot, you can use npm:

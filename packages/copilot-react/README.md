@@ -8,6 +8,12 @@ LLM has changed people's work and lives significantly. However, it does not alwa
 - Support for text-only or text-containing HTML
 - Provide helpers
 
+## Installation
+
+To install copilot-react, you can use npm:
+
+npm i copilot-react
+
 # Example
 See [/packages/demo/src/index.tsx](/packages/demo/src/index.tsx) for details.
 
