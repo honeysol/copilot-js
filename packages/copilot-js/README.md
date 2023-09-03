@@ -1,6 +1,6 @@
-# JS Copilot
+# copilot-js
 
-JS Copilot is a library that provides a high-quality autocompletion of LLM. 
+copilot-js is a library that provides a high-quality autocompletion of LLM. 
 
 # Background
 LLM has changed people's work and lives significantly. However, it does not always return the correct answer and has limited applications. Copilot UI dramatically expands the applications of LLM by allowing collaboration between LLM and humans. For this, high-quality Copilot components are essential for the development of humans with LLM.
@@ -38,7 +38,7 @@ Unlike Github copilot, you can perform operations such as arrow keys, copy, and 
 
 ## Installation
 
-To install JS Copilot, you can use npm:
+To install copilot-js, you can use npm:
 
 npm i copilot-js
 
