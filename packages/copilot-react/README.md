@@ -15,7 +15,7 @@ To install copilot-react, you can use npm:
 npm i copilot-react
 
 # Example
-See [/packages/demo/src/index.tsx](/packages/demo/src/index.tsx) for details.
+See [/packages/demo/src/index.tsx](../demo/src/index.tsx) for details.
 
 ```tsx
 const Component = () => {

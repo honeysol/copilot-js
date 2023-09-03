@@ -12,11 +12,10 @@ LLM has changed people's work and lives significantly. However, it does not alwa
 
 # Remark
 This library converts pure DOM element into copilot.
-If you want to use it with React, use [copilot-react](/packages/copilot-react/README.md).
+If you want to use it with React, use [copilot-react](../copilot-react/README.md).
 
 # Demo
-See [/packages/demo](/packages/demo/README.md)
-
+See [/packages/demo](../demo/README.md)
 
 # Guide for users
 
@@ -78,7 +77,7 @@ When `value` changes, the cursor and completion state will be reset.
 
 # Examples
 
-See [/packages/demo/src/index.tsx](/packages/demo/src/index.tsx)
+See [/packages/demo/src/index.tsx](/../demo/src/index.tsx)
 
 # API Reference
 
