@@ -1,6 +1,6 @@
 # copilot-js
 
-copilot-js is a library that provides a high-quality autocompletion of LLM. 
+copilot-js is a library that provides an autocompletion for LLM. 
 
 # Background
 LLM has changed people's work and lives significantly. However, it does not always return the correct answer and has limited applications. Copilot UI dramatically expands the applications of LLM by allowing collaboration between LLM and humans. For this, high-quality Copilot components are essential for the development of humans with LLM.
@@ -48,9 +48,9 @@ See samples in files:
 
 | API sample | Description |
 |--------------|-------------|
-| /packages/demo/src/api/completion_sse.ts | API sample for server-sent event completion |
-| /packages/demo/src/api/completion_text.ts | API sample for text-only completion |
-| /packages/demo/src/api/completion_openai.ts | API sample for OpenAI completion |
+| [/packages/demo/src/api/completion_sse.ts](../demo/src/api/completion_sse.ts) | API sample for server-sent event completion |
+| [/packages/demo/src/api/completion_text.ts](../demo/src/api/completion_text.ts) | API sample for text-only completion |
+| [/packages/demo/src/api/completion_openai.ts](../demo/src/api/completion_openai.ts) | API sample for OpenAI completion |
 
 ## Step 2 Create a copilot object.
 
@@ -124,21 +124,21 @@ type ErrorHandler = (error: any) => void;
 ### Parameters
 
 - `params`: An object with the following properties:
+  - `handler`: Completion handler.
   - `element`  The DIV element to be converted to a completion-enabled editor
   - `value`: Initial value.
   - `textOnly` (optional): If true, only text can be inserted. Default true.
   - `onChange` (optional): Callback when the value is changed.
   - `delay` (optional): Delay to start automatic completion. If not specified, completion will not start automatically.
-  - `handler`: Completion handler.
   - `errorHandler` (optional): Error handler, callback error in CompletionHandler.
 
 
 ### Fields
 
+- `handler`: Completion handler.
 - `element`  The DIV element to be converted to a completion-enabled editor
 - `value`: Initial value.
 - `textOnly` (optional): If true, only text can be inserted. Default true.
 - `onChange` (optional): Callback when the value is changed.
 - `delay` (optional): Delay to start automatic completion. If not specified, completion will not start automatically.
-- `handler`: Completion handler.
 - `errorHandler` (optional): Error handler, callback error in CompletionHandler.
