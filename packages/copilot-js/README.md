@@ -48,9 +48,9 @@ See samples in files:
 
 | API sample | Description |
 |--------------|-------------|
-| [/packages/demo/src/api/completion_sse.ts](../demo/src/api/completion_sse.ts) | API sample for server-sent event completion |
-| [/packages/demo/src/api/completion_text.ts](../demo/src/api/completion_text.ts) | API sample for text-only completion |
-| [/packages/demo/src/api/completion_openai.ts](../demo/src/api/completion_openai.ts) | API sample for OpenAI completion |
+| [/packages/demo/src/api/completion_sse.ts](../demo/src/api/completion_sse.ts) | API sample for fetch that responds server-sent event |
+| [/packages/demo/src/api/completion_text.ts](../demo/src/api/completion_text.ts) | API sample for fetch that responds text stream |
+| [/packages/demo/src/api/completion_openai.ts](../demo/src/api/completion_openai.ts) | API sample for OpenAI library |
 
 ## Step 2 Create a copilot object.
 
