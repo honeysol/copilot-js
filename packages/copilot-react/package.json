@@ -1,6 +1,6 @@
 {
   "name": "copilot-react",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,7 +17,7 @@
     "react": ">16.8"
   },
   "dependencies": {
-    "copilot-js": "^1.0.3"
+    "copilot-js": "^1.0.4"
   },
   "scripts": {
     "build": "tsc --build ./tsconfig.json",
