@@ -1,22 +1,21 @@
-# JS Copilot
+# copilot-js
 
-JS Copilot is a library that provides a high quaulity autocompletion of LLM. 
+copilot-js is a library that provides an autocompletion for LLM. 
 
 # Background
-LLM has changed people's work and life significantly. However, it does not always return the right answer, and therefore has limited applications. Copilot UI greatly expands the applications of LLM by allowing collaboration between LLM and humans. For this, high-quality Copilot components are essential for the development of humans with LLM.
+LLM has changed people's work and lives significantly. However, it does not always return the correct answer and has limited applications. Copilot UI dramatically expands the applications of LLM by allowing collaboration between LLM and humans. For this, high-quality Copilot components are essential for the development of humans with LLM.
 
 # Features
-- Easy to use UI specialized for natural language input
-- Support for text-only or text containing HTML
-- Provide helpers for OpenAI library, SSE stream and text stream.
+- Easy-to-use UI specialized for natural language input
+- Support for text-only or text-containing HTML
+- Provide helpers
 
 # Remark
-This library convert pure DOM element into copilot.
-If you want to use it with React, use [react-copilot](/packages/react-copilot/README.md).
+This library converts pure DOM element into copilot.
+If you want to use it with React, use [copilot-react](../copilot-react/README.md).
 
 # Demo
-See [/packages/demo](/packages/demo/README.md)
-
+See [/packages/demo](../demo/README.md)
 
 # Guide for users
 
@@ -36,25 +35,24 @@ Unlike Github copilot, you can perform operations such as arrow keys, copy, and 
 
 # Guide for developers
 
-
 ## Installation
 
-To install JS Copilot, you can use npm:
+To install copilot-js, you can use npm:
 
-npm i js-copilot
+npm i copilot-js
 
-## Step 1 Create completion handler.
+## Step 1 Create a completion handler.
 
 Use helpers in "./dist/helper/*" or write a handler by yourself.
 See samples in files: 
 
 | API sample | Description |
 |--------------|-------------|
-| /packages/demo/src/api/completion_sse.ts | API sample for server-sent event completion |
-| /packages/demo/src/api/completion_text.ts | API sample for text-only completion |
-| /packages/demo/src/api/completion_openai.ts | API sample for OpenAI completion |
+| [/packages/demo/src/api/completion_sse.ts](../demo/src/api/completion_sse.ts) | API sample for fetch() that responds to server-sent event (can also be used for OpenAI API)|
+| [/packages/demo/src/api/completion_text.ts](../demo/src/api/completion_text.ts) | API sample for fetch() that responds to text stream |
+| [/packages/demo/src/api/completion_openai.ts](../demo/src/api/completion_openai.ts) | API sample for OpenAI official library |
 
-## Step 2 Create copilot object.
+## Step 2 Create a copilot object.
 
 ```ts
 const copilot = new CopilotEngine({
@@ -67,7 +65,7 @@ const copilot = new CopilotEngine({
 
 ## Step 3 Change parameter in runtime (if needed)
 
-All parameters of constructor except `container` can be changed in runtime.
+All constructor parameters except `container` can be changed in runtime.
 
 ```ts
 copilot.handler = newHandler;
@@ -75,11 +73,11 @@ copilot.onChange =  (text) => console.log("new event handler", text);
 copilot.value = value;
 ```
 
-When `value` is changed, cursor and completion state should be reset.
+When `value` changes, the cursor and completion state will be reset.
 
 # Examples
 
-See [/packages/demo/src/index.tsx](/packages/demo/src/index.tsx)
+See [/packages/demo/src/index.tsx](/../demo/src/index.tsx)
 
 # API Reference
 
@@ -126,21 +124,21 @@ type ErrorHandler = (error: any) => void;
 ### Parameters
 
 - `params`: An object with the following properties:
+  - `handler`: Completion handler.
   - `element`  The DIV element to be converted to a completion-enabled editor
   - `value`: Initial value.
   - `textOnly` (optional): If true, only text can be inserted. Default true.
-  - `onChange` (optional): Callback when value is changed.
+  - `onChange` (optional): Callback when the value is changed.
   - `delay` (optional): Delay to start automatic completion. If not specified, completion will not start automatically.
-  - `handler`: Completion handler.
   - `errorHandler` (optional): Error handler, callback error in CompletionHandler.
 
 
 ### Fields
 
+- `handler`: Completion handler.
 - `element`  The DIV element to be converted to a completion-enabled editor
 - `value`: Initial value.
 - `textOnly` (optional): If true, only text can be inserted. Default true.
-- `onChange` (optional): Callback when value is changed.
+- `onChange` (optional): Callback when the value is changed.
 - `delay` (optional): Delay to start automatic completion. If not specified, completion will not start automatically.
-- `handler`: Completion handler.
 - `errorHandler` (optional): Error handler, callback error in CompletionHandler.

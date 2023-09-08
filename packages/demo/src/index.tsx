@@ -1,9 +1,9 @@
 import React, { ComponentProps, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 
-import { Copilot } from "react-copilot";
+import { Copilot } from "copilot-react";
 import { callCompletion_sse as callCompletion } from "./api/completion_sse";
-import { FetchResponseError } from "js-copilot/dist/helpers/fromFetchTextStream";
+import { FetchResponseError } from "copilot-js/dist/helpers/fromFetchTextStream";
 
 const App = () => {
   const [instruction, setInstruction] = useState<string>(

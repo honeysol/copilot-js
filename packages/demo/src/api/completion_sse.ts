@@ -1,4 +1,4 @@
-import { fromFetchSSEStream } from "js-copilot/dist/helpers/fromFetchSSEStream";
+import { fromFetchSSEStream } from "copilot-js/dist/helpers/fromFetchSSEStream";
 import { createFilter } from "./filter";
 
 export const callCompletion_sse = ({

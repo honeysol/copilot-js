@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 
-import { fromOpenAIStream } from "js-copilot/dist/helpers/fromOpenAIStream";
+import { fromOpenAIStream } from "copilot-js/dist/helpers/fromOpenAIStream";
 import { createFilter } from "./filter";
 
 export const callCompletion_openai = ({

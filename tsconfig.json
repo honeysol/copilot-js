@@ -18,8 +18,8 @@
   },
   "references": [
     {
-      "js-copilot": "packages/js-copilot",
-      "react-copilot": "packages/react-copilot"
+      "copilot-js": "packages/copilot-js",
+      "copilot-react": "packages/copilot-react"
     }
   ]
 }
