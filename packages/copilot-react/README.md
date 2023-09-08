@@ -145,7 +145,7 @@ See [/packages/demo/src/index.tsx](../demo/src/index.tsx) for details.
 Component to handle completion
 
 ```tsx
-<CopilotEngine
+<Copilot
   {...{
     value: string;
     textOnly?: boolean = true;
