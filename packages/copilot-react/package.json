@@ -1,7 +1,7 @@
 {
   "name": "copilot-react",
   "version": "1.0.5",
-  "description": "",
+  "description": "react component that provides an autocompletion for LLM. ",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "publishConfig": {
