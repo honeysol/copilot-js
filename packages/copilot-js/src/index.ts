@@ -6,8 +6,10 @@ import {
 } from "./utils/insert";
 import {
   getTextBeforeCursor,
-  getInnerTextOfUnattachedElement,
   getTextAfterCursor,
+  getTextBeforeSelectionStart,
+  getText,
+  getTextBeforeNode,
 } from "./utils/text";
 import { scrollIntoCursor } from "./utils/scroll";
 
@@ -47,14 +49,6 @@ export type CompletionHandler = (params: {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ErrorHandler = (error: any) => void;
 
-const getCompletionNode = (text: string) => {
-  const node = document.createElement("span");
-  node.classList.add(completionClassName);
-  node.style.opacity = "0.5";
-  node.innerText = text;
-  return node;
-};
-
 /**
  * @class CopilotEngine
  * @description Engine to handle completion. You can conver any DIV element to a completion-enabled editor.
@@ -85,9 +79,27 @@ export class CopilotEngine {
    */
   handler?: CompletionHandler;
   /**
-   * @field {CompletionHandler} errorHandler - error handler, callback error in CompletionHandler
+   * @field {ErrorHandler} errorHandler - error handler, callback error in CompletionHandler
    */
   errorHandler?: ErrorHandler;
+
+  /**
+   * @field {number} selectionStart - The start position of the selection
+   */
+  selectionStart = 0;
+  /**
+   * @field {number} selectionEnd - The end position of the selection
+   */
+  selectionEnd = 0;
+
+  /**
+   * @field {number} selectionEnd - The end position of the selection
+   */
+  onSelectionChange?: (params: {
+    selectionStart: number;
+    selectionEnd: number;
+  }) => void;
+
   /**
    * @internal
    */
@@ -108,15 +120,35 @@ export class CopilotEngine {
    * @internal
    */
   private completionRequest?: StreamState;
+
+  /**
+   *
+   * @internal
+   */
+  private styleElement?: HTMLStyleElement;
+
+  /**
+   *
+   * @internal
+   */
+  private completionClassName?: string;
+
   constructor(params: {
-    value: string;
+    value?: string;
     textOnly?: boolean;
     onChange?: (value: string) => void;
+    onSelectionChange?: (params: {
+      selectionStart: number;
+      selectionEnd: number;
+    }) => void;
     delay?: number;
     handler: CompletionHandler;
     errorHandler?: ErrorHandler;
     element: HTMLDivElement;
+    placeholder?: string;
+    completionClassName?: string;
   }) {
+    console.log("CopilotEngine", this);
     this.textOnly = params.textOnly !== false;
     this.onChange = params.onChange;
     this.delay = params.delay;
@@ -124,9 +156,36 @@ export class CopilotEngine {
     this.errorHandler = params.errorHandler;
     this.containerElement = params.element;
     this.value = params.value;
+    this.completionClassName = params.completionClassName;
+    this.onSelectionChange = params.onSelectionChange;
+
+    const placeholder = params.placeholder;
+    if (placeholder) {
+      const containerId = Math.random().toString(36).slice(2);
+      this.styleElement = document.createElement("style");
+      this.styleElement.textContent = `
+      [data-copilot-editor-id="${containerId}"][data-copolot-editor-empty="true"]::after {
+        content: attr(data-copilot-editor-placeholder);
+        opacity: 0.5;
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+      }`;
+      this.containerElement.setAttribute("data-copilot-editor-id", containerId);
+      this.containerElement.setAttribute(
+        "data-copilot-editor-placeholder",
+        placeholder,
+      );
+      document.head.appendChild(this.styleElement);
+    }
 
     this.containerElement.setAttribute("contenteditable", "true");
-    this.containerElement.addEventListener("keydown", this.onKeyDown);
+    this.containerElement.addEventListener("keydown", this.onKeyDown, {
+      capture: true,
+      force: true,
+    } as { capture: boolean });
     this.containerElement.addEventListener("input", this.onInput);
     this.containerElement.addEventListener("paste", this.onPaste);
     this.containerElement.addEventListener("drop", this.onDrop);
@@ -138,6 +197,9 @@ export class CopilotEngine {
       "compositionend",
       this.onCompositionEnd,
     );
+    document.addEventListener("selectionchange", this.onSelectionChangeLocal);
+
+    this.updatePlaceholder();
   }
 
   get value() {
@@ -145,9 +207,9 @@ export class CopilotEngine {
   }
 
   set value(value: string | undefined) {
-    if ((value || "") !== this._currentText) {
+    if (value !== undefined && value !== this._currentText) {
       if (this.containerElement) {
-        this.containerElement.innerText = value || "";
+        this.containerElement.innerText = value;
       }
     }
   }
@@ -165,22 +227,35 @@ export class CopilotEngine {
       "compositionend",
       this.onCompositionEnd,
     );
+    document.removeEventListener(
+      "selectionchange",
+      this.onSelectionChangeLocal,
+    );
+    if (this.styleElement) document.head.removeChild(this.styleElement);
   }
   /**
    * @internal
    */
   private onKeyDown = (e: KeyboardEvent) => {
+    if (this.textOnly) {
+      e.stopImmediatePropagation();
+      e.stopPropagation();
+    }
     if (this.isInComposition) {
       return;
     }
     if (e.key === "Enter" && e.ctrlKey) {
       e.preventDefault();
+      e.stopImmediatePropagation();
+      e.stopPropagation();
       this.startCompletion();
-    } else if (e.key === "Enter" && !e.altKey && !e.metaKey) {
+      this.updatePlaceholder();
+    } else if (this.textOnly && e.key === "Enter" && !e.altKey && !e.metaKey) {
       e.preventDefault();
       insertBeforeCursor("\n");
       this.onValueChange();
       scrollIntoCursor(this.containerElement);
+      this.updatePlaceholder();
     } else if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) {
       // noop
     } else if (e.key === "Tab") {
@@ -197,13 +272,17 @@ export class CopilotEngine {
       insertBeforeNode(determinedCompletion, this.completionElement);
       scrollIntoCursor(this.containerElement);
       this.onValueChange();
+      this.onSelectionChangeLocal(undefined, true);
+      this.updatePlaceholder();
     } else if (["Escape"].includes(e.key)) {
       this.stopCompletion();
+      this.updatePlaceholder();
     } else if (e.key.length > 1) {
       // normal key
     } else {
       this.stopCompletion();
       this.requestCompletion();
+      this.updatePlaceholder();
     }
   };
   /**
@@ -211,6 +290,7 @@ export class CopilotEngine {
    */
   private onInput = () => {
     this.onValueChange();
+    this.updatePlaceholder();
   };
 
   /**
@@ -219,10 +299,13 @@ export class CopilotEngine {
   private onPaste = (e: ClipboardEvent) => {
     if (!this.textOnly && !this.completionElement) return;
     e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
     const text = e.clipboardData?.getData("text/plain");
     if (!text) return;
     insertBeforeCursor(text);
     this.onValueChange();
+    this.updatePlaceholder();
   };
 
   /**
@@ -231,10 +314,13 @@ export class CopilotEngine {
   private onDrop = (e: DragEvent) => {
     if (!this.textOnly && !this.completionElement) return;
     e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
     const text = e.dataTransfer?.getData("text/plain");
     if (!text) return;
     insertBeforeCursor(text);
     this.onValueChange();
+    this.updatePlaceholder();
   };
 
   /**
@@ -257,15 +343,47 @@ export class CopilotEngine {
    */
   private getAllText() {
     if (this.completionRequest && this.containerElement) {
-      const node = this.containerElement.cloneNode(true) as HTMLDivElement;
-      node
-        .querySelectorAll(`.${completionClassName}`)
-        .forEach((node) => node.remove());
-      return getInnerTextOfUnattachedElement(node).replace(/\n$/, "");
+      return getText(this.containerElement, this.pruner).replace(/\n$/, "");
     } else {
       return this.containerElement?.innerText.replace(/\n$/, "") || "";
     }
   }
+
+  /**
+   * @internal
+   */
+  private onSelectionChangeLocal = (e?: Event, force = false) => {
+    if (this.completionRequest && !force) return;
+
+    if (force) {
+      if (!this.containerElement || !this.completionElement) {
+        return;
+      }
+      this.selectionStart = this.selectionEnd =
+        getTextBeforeNode(this.containerElement, this.completionElement, 0)
+          ?.length || 0;
+    } else {
+      const selection = window.getSelection();
+      if (!selection) {
+        return;
+      }
+      const range = selection.getRangeAt(0);
+      if (
+        !this.containerElement.contains(range.endContainer) ||
+        !this.containerElement.contains(range.startContainer)
+      ) {
+        return;
+      }
+      this.selectionEnd =
+        getTextBeforeCursor(this.containerElement)?.length || 0;
+      this.selectionStart =
+        getTextBeforeSelectionStart(this.containerElement)?.length || 0;
+    }
+    this.onSelectionChange?.({
+      selectionEnd: this.selectionEnd,
+      selectionStart: this.selectionStart,
+    });
+  };
 
   /**
    * @internal
@@ -282,14 +400,31 @@ export class CopilotEngine {
   /**
    * @internal
    */
+  private updatePlaceholder() {
+    const text =
+      !!this.completionRequest ||
+      this.containerElement.innerText.replace(/\n$/, "");
+    console.log("updatePlaceholder", JSON.stringify(text), !!text);
+    if (text) {
+      this.containerElement.removeAttribute("data-copolot-editor-empty");
+    } else {
+      this.containerElement.setAttribute("data-copolot-editor-empty", "true");
+    }
+  }
+
+  pruner = (node?: Element) => {
+    node?.querySelectorAll(`.${completionClassName}`).forEach((node) => {
+      node.remove();
+    });
+  };
+
+  /**
+   * @internal
+   */
   private stopCompletion() {
     if (!this.completionRequest) return;
     // Element with completionClassName may be separated by pasting HTML, so we need to remove all.
-    this.containerElement
-      ?.querySelectorAll(`.${completionClassName}`)
-      .forEach((dom) => {
-        dom.remove();
-      });
+    this.pruner(this.containerElement);
     this.completionElement = undefined;
     this.completionRequest?.abort();
     this.completionRequest = undefined;
@@ -300,7 +435,7 @@ export class CopilotEngine {
    */
   private startCompletion() {
     this.stopCompletion();
-    this.completionElement = getCompletionNode("");
+    this.completionElement = this.getCompletionNode("");
     insertAfterCursor(this.completionElement);
     const precedingText = getTextBeforeCursor(this.containerElement);
     const followingText = getTextAfterCursor(this.containerElement)?.replace(
@@ -312,7 +447,6 @@ export class CopilotEngine {
       if (this.errorHandler) this.errorHandler?.(error);
       else throw error;
     };
-    console.log({ precedingText, followingText });
     try {
       this.completionRequest = this.handler?.({
         precedingText,
@@ -351,4 +485,19 @@ export class CopilotEngine {
       }
     };
   })();
+
+  /**
+   * @internal
+   *
+   * @param {string} completionText - Text to be completed
+   * @returns {HTMLSpanElement} - Completion element
+   */
+  private getCompletionNode(text: string) {
+    const node = document.createElement("span");
+    node.classList.add(completionClassName);
+    if (this.completionClassName) node.classList.add(this.completionClassName);
+    node.style.opacity = "0.5";
+    node.innerText = text;
+    return node;
+  }
 }

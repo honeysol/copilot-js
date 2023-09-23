@@ -9,7 +9,7 @@
  * @param node - The HTMLElement from which to retrieve the innerText.
  * @returns The innerText of the provided node.
  */
-export const getInnerTextOfUnattachedElement = (node: HTMLElement) => {
+const getInnerTextOfUnattachedElement = (node: HTMLElement) => {
   node.style.opacity = "0";
   node.style.position = "absolute";
   node.style.pointerEvents = "none";
@@ -21,51 +21,83 @@ export const getInnerTextOfUnattachedElement = (node: HTMLElement) => {
   return text;
 };
 
-const getTextOfRange = (range: Range) => {
+const getTextOfRange = (range: Range, pruner?: (node: Element) => void) => {
   const fragment = range.cloneContents();
   const div = document.createElement("div");
   div.appendChild(fragment);
+  pruner?.(div);
   return getInnerTextOfUnattachedElement(div);
 };
 
-const getTextBeforeNode = (
+export const getTextBeforeNode = (
   containerNode: Node | undefined | null,
   node: Node,
   offset: number,
+  pruner?: (node: Element) => void,
 ) => {
   if (!containerNode) return;
   const range = document.createRange();
   range.setStart(containerNode, 0);
   range.setEnd(node, offset);
-  return getTextOfRange(range);
+  return getTextOfRange(range, pruner);
 };
 
-const getTextAfterNode = (
+export const getTextAfterNode = (
   containerNode: Node | undefined | null,
   node: Node,
   offset: number,
+  pruner?: (node: Element) => void,
 ) => {
   if (!containerNode) return;
   const range = document.createRange();
   range.setStart(node, offset);
   range.setEnd(containerNode, containerNode.childNodes.length);
-  return getTextOfRange(range);
+  return getTextOfRange(range, pruner);
 };
 
-export const getTextBeforeCursor = (containerNode: Node | undefined | null) => {
+export const getTextBeforeCursor = (
+  containerNode: Node | undefined | null,
+  pruner?: (node: Element) => void,
+) => {
   const selection = window.getSelection();
   if (!selection) return;
   const range = selection.getRangeAt(0);
   const node = range.endContainer;
   const offset = range.endOffset;
-  return getTextBeforeNode(containerNode, node, offset);
+  return getTextBeforeNode(containerNode, node, offset, pruner);
 };
 
-export const getTextAfterCursor = (containerNode: Node | undefined | null) => {
+export const getTextBeforeSelectionStart = (
+  containerNode: Node | undefined | null,
+  pruner?: (node: Element) => void,
+) => {
+  const selection = window.getSelection();
+  if (!selection) return;
+  const range = selection.getRangeAt(0);
+  const node = range.startContainer;
+  const offset = range.startOffset;
+  return getTextBeforeNode(containerNode, node, offset, pruner);
+};
+
+export const getTextAfterCursor = (
+  containerNode: Node | undefined | null,
+  pruner?: (node: Element) => void,
+) => {
   const selection = window.getSelection();
   if (!selection) return;
   const range = selection.getRangeAt(0);
   const node = range.endContainer;
   const offset = range.endOffset;
-  return getTextAfterNode(containerNode, node, offset);
+  return getTextAfterNode(containerNode, node, offset, pruner);
+};
+
+export const getText = (
+  containerNode: Element | undefined | null,
+  pruner: (node: Element) => void,
+) => {
+  if (!containerNode) return "";
+  const node = containerNode.cloneNode(true) as Element;
+  pruner(node);
+  if (!(node instanceof HTMLElement)) return "";
+  return getInnerTextOfUnattachedElement(node).replace(/\n$/, "");
 };

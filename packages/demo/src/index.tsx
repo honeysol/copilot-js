@@ -1,4 +1,4 @@
-import React, { ComponentProps, useMemo, useState } from "react";
+import React, { ComponentProps, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 
 import { Copilot } from "copilot-react";
@@ -9,6 +9,7 @@ const App = () => {
   const [instruction, setInstruction] = useState<string>(
     "Write novel in Japanese.",
   );
+  const outputRef = useRef<HTMLTextAreaElement>(null);
   const [textOnly, setTextOnly] = useState<boolean>(true);
   const [text, setText] = useState<string>("");
   const [apiKey, setApiKey] = useState<string>(
@@ -17,7 +18,7 @@ const App = () => {
   const [saveApiKey, setSaveApiKey] = useState<boolean>(!!apiKey);
   const copilotProps: Pick<
     ComponentProps<typeof Copilot>,
-    "onChange" | "handler" | "errorHandler"
+    "onChange" | "handler" | "errorHandler" | "style" | "onSelectionChange"
   > = useMemo(
     () => ({
       style: {
@@ -31,6 +32,19 @@ const App = () => {
       },
       onChange: (value: string) => {
         setText(value);
+      },
+      onSelectionChange: ({
+        selectionStart,
+        selectionEnd,
+      }: {
+        selectionStart: number;
+        selectionEnd: number;
+      }) => {
+        if (outputRef.current) {
+          console.log(selectionStart, selectionEnd, outputRef);
+          outputRef.current.selectionStart = selectionStart;
+          outputRef.current.selectionEnd = selectionEnd;
+        }
       },
       handler: (params) => {
         return callCompletion({
@@ -58,7 +72,12 @@ const App = () => {
       >
         <div style={{}}>
           <div style={{}}>Copilot</div>
-          <Copilot textOnly={textOnly} value={text} {...copilotProps} />
+          <Copilot
+            {...copilotProps}
+            textOnly={textOnly}
+            value={text}
+            placeholder="Write something with support of copilot."
+          />
           Ctrl+Enter: Start completion <br />
           Esc: Close completion
         </div>
@@ -80,6 +99,7 @@ const App = () => {
         <div style={{ marginLeft: "20px" }}>
           <div style={{}}>Generated text</div>
           <textarea
+            ref={outputRef}
             style={{
               height: "200px",
               width: "200px",

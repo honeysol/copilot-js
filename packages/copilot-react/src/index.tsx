@@ -30,6 +30,8 @@ export const Copilot = React.memo(function Copilot({
   delay,
   handler,
   errorHandler,
+  placeholder,
+  onSelectionChange,
 }: {
   style?: CSSProperties;
   className?: string | undefined;
@@ -39,6 +41,11 @@ export const Copilot = React.memo(function Copilot({
   delay?: number;
   handler: CompletionHandler;
   errorHandler: ErrorHandler;
+  placeholder?: string;
+  onSelectionChange?: (params: {
+    selectionStart: number;
+    selectionEnd: number;
+  }) => void;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const copilot = useRef<CopilotEngine>();
@@ -54,6 +61,8 @@ export const Copilot = React.memo(function Copilot({
         value,
         errorHandler,
         element: containerRef.current,
+        placeholder,
+        onSelectionChange,
       });
     } else {
       copilot.current.textOnly = textOnly;
