@@ -22,7 +22,8 @@
   "author": "",
   "license": "MIT",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "exports": {
     "./dist/helpers/*": "./dist/helpers/*",
