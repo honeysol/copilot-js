@@ -32,7 +32,6 @@ export const scrollIntoCursor = (container?: Element | null) => {
     }
   })();
   if (!rect?.height && !rect?.width) {
-    console.log("empty rect", rect);
     return;
   }
   const containerRect = container.getBoundingClientRect();

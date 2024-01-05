@@ -404,7 +404,6 @@ export class CopilotEngine {
     const text =
       !!this.completionRequest ||
       this.containerElement.innerText.replace(/\n$/, "");
-    console.log("updatePlaceholder", JSON.stringify(text), !!text);
     if (text) {
       this.containerElement.removeAttribute("data-copolot-editor-empty");
     } else {
