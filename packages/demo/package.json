@@ -1,11 +1,11 @@
 {
   "name": "copilot-demo",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "copilot-react": "^1.0.5",
+    "copilot-react": "^1.0.6",
     "openai": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
