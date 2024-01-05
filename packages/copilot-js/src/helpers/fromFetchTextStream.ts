@@ -40,27 +40,27 @@ export const fromFetchTextStream = ({
       controller.abort();
     },
     promise: (async () => {
-      const response = await responsePromise;
-      if (!response.ok) {
-        throw await (async () => {
-          try {
-            const isJson = response.headers
-              .get("Content-Type")
-              ?.includes("application/json");
-            if (isJson) {
-              return new FetchResponseError(response, await response.json());
-            } else {
-              return new FetchResponseError(response, await response.text());
-            }
-          } catch (e) {
-            return new FetchResponseError(response, undefined, e as Error);
-          }
-        })();
-      }
-      const reader = response.body?.getReader();
-      if (!reader) return;
-      const decoder = new TextDecoder("utf-8");
       try {
+        const response = await responsePromise;
+        if (!response.ok) {
+          throw await (async () => {
+            try {
+              const isJson = response.headers
+                .get("Content-Type")
+                ?.includes("application/json");
+              if (isJson) {
+                return new FetchResponseError(response, await response.json());
+              } else {
+                return new FetchResponseError(response, await response.text());
+              }
+            } catch (e) {
+              return new FetchResponseError(response, undefined, e as Error);
+            }
+          })();
+        }
+        const reader = response.body?.getReader();
+        if (!reader) return;
+        const decoder = new TextDecoder("utf-8");
         // eslint-disable-next-line no-constant-condition
         while (true) {
           const { done, value } = await reader.read();
@@ -72,6 +72,7 @@ export const fromFetchTextStream = ({
         }
       } catch (e) {
         if ((e as Error).name === "AbortError") {
+          // Ignore abort errors.
           return;
         } else {
           throw e;
