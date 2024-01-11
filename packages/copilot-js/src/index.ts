@@ -215,7 +215,10 @@ export class CopilotEngine {
   }
 
   close() {
-    this.containerElement.removeEventListener("keydown", this.onKeyDown);
+    this.containerElement.removeEventListener("keydown", this.onKeyDown, {
+      capture: true,
+      force: true,
+    } as { capture: boolean });
     this.containerElement.removeEventListener("input", this.onInput);
     this.containerElement.removeEventListener("paste", this.onPaste);
     this.containerElement.removeEventListener("drop", this.onDrop);
