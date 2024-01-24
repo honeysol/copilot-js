@@ -148,7 +148,6 @@ export class CopilotEngine {
     placeholder?: string;
     completionClassName?: string;
   }) {
-    console.log("CopilotEngine", this);
     this.textOnly = params.textOnly !== false;
     this.onChange = params.onChange;
     this.delay = params.delay;
@@ -236,6 +235,7 @@ export class CopilotEngine {
     );
     if (this.styleElement) document.head.removeChild(this.styleElement);
   }
+
   /**
    * @internal
    */
@@ -266,12 +266,38 @@ export class CopilotEngine {
       if (!this.completionRequest || !this.completionElement) return;
       const copletionText = this.completionElement.innerText;
       if (!copletionText) return;
-      const sepeartorMatch = copletionText.match(/[。、！,」｝.,!} \n]/);
-      const separatorPosition = sepeartorMatch
-        ? (sepeartorMatch.index || 0) + sepeartorMatch[0].length
-        : copletionText.length;
-      const determinedCompletion = copletionText.slice(0, separatorPosition);
-      this.completionElement.innerText = copletionText.slice(separatorPosition);
+
+      const { determinedCompletion, remainingCompletion } = (() => {
+        const textBeforeCursor = getTextBeforeCursor(
+          this.completionElement,
+          undefined,
+          "manual",
+        );
+        if (textBeforeCursor) {
+          const textAfterCursor = copletionText.slice(textBeforeCursor.length);
+          console.log({
+            textBeforeCursor,
+            textAfterCursor,
+            copletionText,
+          });
+          return {
+            determinedCompletion: textBeforeCursor || "",
+            remainingCompletion: textAfterCursor || "",
+          };
+        }
+        const sepeartorMatch = copletionText.match(/[。、！,」｝.,!} \n]/);
+        const separatorPosition = sepeartorMatch
+          ? (sepeartorMatch.index || 0) + sepeartorMatch[0].length
+          : copletionText.length;
+        const determinedCompletion = copletionText.slice(0, separatorPosition);
+        const remainingCompletion = copletionText.slice(separatorPosition);
+        return {
+          determinedCompletion,
+          remainingCompletion,
+        };
+      })();
+
+      this.completionElement.innerText = remainingCompletion;
       insertBeforeNode(determinedCompletion, this.completionElement);
       scrollIntoCursor(this.containerElement);
       this.onValueChange();
@@ -288,6 +314,7 @@ export class CopilotEngine {
       this.updatePlaceholder();
     }
   };
+
   /**
    * @internal
    */
@@ -469,6 +496,7 @@ export class CopilotEngine {
       }
     })();
   }
+
   /**
    * @internal
    */

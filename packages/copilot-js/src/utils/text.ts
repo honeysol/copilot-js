@@ -21,12 +21,59 @@ const getInnerTextOfUnattachedElement = (node: HTMLElement) => {
   return text;
 };
 
-const getTextOfRange = (range: Range, pruner?: (node: Element) => void) => {
+type textMode = "unattached" | "direct" | "manual";
+
+const getTextOfRange = (
+  range: Range,
+  pruner?: (node: Element) => void,
+  mode?: textMode,
+) => {
   const fragment = range.cloneContents();
   const div = document.createElement("div");
   div.appendChild(fragment);
   pruner?.(div);
-  return getInnerTextOfUnattachedElement(div);
+  if (mode === "direct") {
+    return div.innerText;
+  } else if (mode === "manual") {
+    const isBlockElement = (element: HTMLElement) => {
+      const display = window.getComputedStyle(element).display;
+      return ["block", "flex", "grid", "table"].includes(display);
+    };
+    const isBrElement = (element: HTMLElement) => {
+      return element.tagName.toLowerCase() === "br";
+    };
+    const fragments: string[] = [];
+    let state: undefined | "br" | "block";
+    const traverse = (node: Node) => {
+      if (node instanceof Text) {
+        state = undefined;
+        if (node.textContent) {
+          fragments.push(node.textContent);
+        }
+      } else if (node instanceof HTMLElement) {
+        if (isBrElement(node)) {
+          state = "br";
+          fragments.push("\n");
+        } else if (isBlockElement(node)) {
+          if (state !== "block") {
+            fragments.push("\n");
+          }
+          state = "block";
+          node.childNodes.forEach(traverse);
+          if (state !== "block") {
+            fragments.push("\n");
+          }
+          state = "block";
+        } else {
+          node.childNodes.forEach(traverse);
+        }
+      }
+    };
+    traverse(div);
+    return fragments.join("");
+  } else {
+    return getInnerTextOfUnattachedElement(div);
+  }
 };
 
 export const getTextBeforeNode = (
@@ -34,12 +81,13 @@ export const getTextBeforeNode = (
   node: Node,
   offset: number,
   pruner?: (node: Element) => void,
+  mode?: textMode,
 ) => {
   if (!containerNode) return;
   const range = document.createRange();
   range.setStart(containerNode, 0);
   range.setEnd(node, offset);
-  return getTextOfRange(range, pruner);
+  return getTextOfRange(range, pruner, mode);
 };
 
 export const getTextAfterNode = (
@@ -47,48 +95,52 @@ export const getTextAfterNode = (
   node: Node,
   offset: number,
   pruner?: (node: Element) => void,
+  mode?: textMode,
 ) => {
   if (!containerNode) return;
   const range = document.createRange();
   range.setStart(node, offset);
   range.setEnd(containerNode, containerNode.childNodes.length);
-  return getTextOfRange(range, pruner);
+  return getTextOfRange(range, pruner, mode);
 };
 
 export const getTextBeforeCursor = (
   containerNode: Node | undefined | null,
   pruner?: (node: Element) => void,
+  mode?: textMode,
 ) => {
   const selection = window.getSelection();
   if (!selection) return;
   const range = selection.getRangeAt(0);
   const node = range.endContainer;
   const offset = range.endOffset;
-  return getTextBeforeNode(containerNode, node, offset, pruner);
+  return getTextBeforeNode(containerNode, node, offset, pruner, mode);
 };
 
 export const getTextBeforeSelectionStart = (
   containerNode: Node | undefined | null,
   pruner?: (node: Element) => void,
+  mode?: textMode,
 ) => {
   const selection = window.getSelection();
   if (!selection) return;
   const range = selection.getRangeAt(0);
   const node = range.startContainer;
   const offset = range.startOffset;
-  return getTextBeforeNode(containerNode, node, offset, pruner);
+  return getTextBeforeNode(containerNode, node, offset, pruner, mode);
 };
 
 export const getTextAfterCursor = (
   containerNode: Node | undefined | null,
   pruner?: (node: Element) => void,
+  mode?: textMode,
 ) => {
   const selection = window.getSelection();
   if (!selection) return;
   const range = selection.getRangeAt(0);
   const node = range.endContainer;
   const offset = range.endOffset;
-  return getTextAfterNode(containerNode, node, offset, pruner);
+  return getTextAfterNode(containerNode, node, offset, pruner, mode);
 };
 
 export const getText = (
